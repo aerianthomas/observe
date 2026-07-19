@@ -8,8 +8,8 @@ set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 
 set(BGFX_CONFIG_MULTITHREADED ON CACHE BOOL "" FORCE)
-set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BGFX_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(BGFX_BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
+set(BGFX_BUILD_TOOLS ON CACHE BOOL "" FORCE)
 set(BGFX_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 set(SHADERC
@@ -28,15 +28,37 @@ set(SHADER_OUTPUTS)
 set(SHADER_PLATFORM windows)
 set(SHADER_PROFILE s_5_0)
 
+set(SHADER_VARYING_ARGS "")
+
+if(SHADER_VARYING)
+    list(APPEND SHADER_VARYING_ARGS
+        --varyingdef
+        ${SHADER_SOURCE_DIR}/${SHADER_VARYING}
+    )
+endif()
+
 function(observe_compile_shader)
 
     cmake_parse_arguments(
         SHADER
         ""
-        "NAME;TYPE"
+        "NAME;TYPE;VARYING"
         ""
         ${ARGN}
     )
+
+    message(STATUS "Shader ${SHADER_NAME} varying = ${SHADER_VARYING}")
+
+    set(SHADER_VARYING_ARGS)
+
+    if(SHADER_VARYING)
+        list(APPEND SHADER_VARYING_ARGS
+            --varyingdef
+            ${SHADER_SOURCE_DIR}/${SHADER_VARYING}
+        )
+    endif()
+
+    message(STATUS "Shader ${SHADER_NAME} varying args = ${SHADER_VARYING_ARGS}")
 
     add_custom_command(
         OUTPUT
@@ -50,6 +72,7 @@ function(observe_compile_shader)
             --platform ${SHADER_PLATFORM}
             -p ${SHADER_PROFILE}
             -i ${CMAKE_SOURCE_DIR}/external/bgfx.cmake/bgfx/src
+            ${SHADER_VARYING_ARGS}
 
         DEPENDS
             ${SHADER_SOURCE_DIR}/${SHADER_NAME}.sc
@@ -73,6 +96,16 @@ observe_compile_shader(
 observe_compile_shader(
     NAME fs_triangle
     TYPE fragment)
+
+observe_compile_shader(
+    NAME vs_imgui
+    TYPE vertex
+    VARYING varying_imgui.def.sc)
+
+observe_compile_shader(
+    NAME fs_imgui
+    TYPE fragment
+    VARYING varying_imgui.def.sc)
 
 add_custom_target(
     shaders ALL

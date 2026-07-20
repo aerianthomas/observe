@@ -117,7 +117,16 @@ add_custom_target(
 add_subdirectory(external/SDL3)
 #add_subdirectory(external/freetype)
 add_subdirectory(external/bgfx.cmake)
+#target_compile_definitions(bimg_decode PRIVATE BIMG_CONFIG_PARSE_EXR=0)
 
+set_source_files_properties(
+    #Exclude bimg's duplicate miniz.c (fixes LNK4006 conflicts with SDL3)
+    #Used only for (OpenEXR/HDR) texture loading via tinyexr.
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/bgfx.cmake/bimg/3rdparty/tinyexr/deps/miniz/miniz.c
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/bgfx.cmake/cmake/bimg
+    PROPERTIES HEADER_FILE_ONLY ON
+    #Optionally un-comment EXR=0 after add_subdirectory block to prevent harmless LNK4006.
+)
 
 set(APP_SOURCES
     src/app/main.cpp

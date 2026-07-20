@@ -1,5 +1,8 @@
 #include <observe/application.h>
 #include <observe/renderer.h>
+#include <imgui.h>
+
+#include <iostream>
 
 namespace observe
 {
@@ -36,6 +39,8 @@ namespace observe
     {
         while (m_window.pollEvents())
         {
+            // std::cout << "frame\n";
+
             m_imgui.beginFrame();
 
             m_renderer.beginFrame();
@@ -46,6 +51,8 @@ namespace observe
 
             m_renderer.endFrame();
         }
+
+        std::cout << "run loop exited\n";
     }
 
 }

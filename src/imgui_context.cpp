@@ -19,6 +19,8 @@ namespace observe
 
         ImGui::CreateContext();
 
+        ImGui::StyleColorsDark(); // added — otherwise you get 1.0-alpha-default styling
+
         if (!ImGui_ImplSDL3_InitForOther(
                 window.handle()))
         {
@@ -43,6 +45,8 @@ namespace observe
     {
         if (!m_initialized)
             return;
+
+        ImGui::Render(); // added — without this GetDrawData() is stale/empty
     }
 
     void ImGuiContext::shutdown()

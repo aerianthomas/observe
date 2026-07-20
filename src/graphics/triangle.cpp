@@ -1,4 +1,4 @@
-#include <iostream>
+// #include <iostream>
 #include <filesystem>
 
 #include <observe/triangle.h>
@@ -15,7 +15,7 @@ namespace observe
 
     bool Triangle::initialize()
     {
-        std::cout
+        /*std::cout
             << "Working directory: "
             << std::filesystem::current_path()
             << "\n";
@@ -24,6 +24,7 @@ namespace observe
             << "Vertex shader exists: "
             << std::filesystem::exists("shaders/vs_triangle.bin")
             << "\n";
+        */
 
         Vertex vertices[] =
             {
@@ -36,7 +37,7 @@ namespace observe
                 3,
                 m_layout))
         {
-            std::cout << "Mesh creation failed\n";
+            // std::cout << "Mesh creation failed\n";
             return false;
         }
 
@@ -44,7 +45,7 @@ namespace observe
                 "shaders/vs_triangle.bin",
                 "shaders/fs_triangle.bin"))
         {
-            std::cout << "Shader loading failed\n";
+            // std::cout << "Shader loading failed\n";
             return false;
         }
 

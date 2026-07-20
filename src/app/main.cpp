@@ -1,5 +1,5 @@
 #include <observe/application.h>
-#include <iostream>
+// #include <iostream>
 
 int main()
 {
@@ -7,8 +7,8 @@ int main()
 
     if (!app.initialize())
     {
-        std::cout << "Application initialization failed\n";
-        std::cin.get();
+        // std::cout << "Application initialization failed\n";
+        // std::cin.get();
         return -1;
     }
 

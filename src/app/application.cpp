@@ -2,7 +2,7 @@
 #include <observe/renderer.h>
 #include <imgui.h>
 
-#include <iostream>
+// #include <iostream>
 
 namespace observe
 {
@@ -39,9 +39,9 @@ namespace observe
     {
         while (m_window.pollEvents())
         {
-            // std::cout << "frame\n";
-
             m_imgui.beginFrame();
+
+            ImGui::ShowDemoWindow(); // <- proves the pipeline works end-to-end
 
             m_renderer.beginFrame();
 
@@ -52,7 +52,7 @@ namespace observe
             m_renderer.endFrame();
         }
 
-        std::cout << "run loop exited\n";
+        // std::cout << "run loop exited\n";
     }
 
 }

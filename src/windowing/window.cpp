@@ -5,7 +5,7 @@
 
 #include <backends/imgui_impl_sdl3.h>
 
-#include <iostream>
+// #include <iostream>
 
 namespace observe
 {
@@ -69,8 +69,8 @@ namespace observe
             SDL_PROP_WINDOW_WIN32_HWND_POINTER,
             nullptr);
 
-        std::cout << "SDL_Window = " << m_window << '\n';
-        std::cout << "HWND       = " << hwnd << '\n';
+        // std::cout << "SDL_Window = " << m_window << '\n';
+        // std::cout << "HWND       = " << hwnd << '\n';
 
         return hwnd;
     }

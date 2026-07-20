@@ -115,7 +115,7 @@ add_custom_target(
 )
 
 add_subdirectory(external/SDL3)
-add_subdirectory(external/freetype)
+#add_subdirectory(external/freetype)
 add_subdirectory(external/bgfx.cmake)
 
 
@@ -186,7 +186,7 @@ target_include_directories(observe
 
 target_link_libraries(observe PRIVATE
     SDL3::SDL3-static
-    freetype
+    #freetype
     bgfx
     bx
 )

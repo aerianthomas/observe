@@ -18,6 +18,8 @@ namespace observe
 
         bool initialize(const Window &window);
 
+        void resize(uint32_t width, uint32_t height);
+
         void beginFrame();
         void endFrame();
 

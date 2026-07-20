@@ -53,9 +53,38 @@ namespace observe
         {
             ImGui_ImplSDL3_ProcessEvent(&event);
 
-            if (event.type == SDL_EVENT_QUIT)
+            switch (event.type)
+            {
+            case SDL_EVENT_QUIT:
                 return false;
+                /*SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED rather than
+                SDL_EVENT_WINDOW_RESIZED — the latter reports the
+                window's logical/point size, while bgfx's swapchain
+                needs actual framebuffer pixels. On Windows these
+                are usually equal, but it's the technically correct
+                event and it costs nothing.*/
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                m_width = event.window.data1;
+                m_height = event.window.data2;
+                m_sizeChanged = true;
+                break;
+
+            default:
+                break;
+            }
         }
+
+        return true;
+    }
+
+    bool Window::consumeResize(int &outWidth, int &outHeight) noexcept
+    {
+        if (!m_sizeChanged)
+            return false;
+
+        outWidth = m_width;
+        outHeight = m_height;
+        m_sizeChanged = false;
 
         return true;
     }

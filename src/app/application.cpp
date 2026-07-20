@@ -39,6 +39,16 @@ namespace observe
     {
         while (m_window.pollEvents())
         {
+            int width = 0;
+            int height = 0;
+
+            if (m_window.consumeResize(width, height))
+            {
+                m_renderer.resize(
+                    static_cast<uint32_t>(width),
+                    static_cast<uint32_t>(height));
+            }
+
             m_imgui.beginFrame();
 
             ImGui::ShowDemoWindow(); // <- proves the pipeline works end-to-end

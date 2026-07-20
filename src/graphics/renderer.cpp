@@ -57,6 +57,28 @@ namespace observe
         return true;
     }
 
+    void Renderer::resize(uint32_t width, uint32_t height)
+    {
+        if (!m_initialized)
+            return;
+
+        // Window is minimized (0x0) - bgfx::reset() doesn't accept
+        // zero dimensions, so just wait for the next real resize.
+        if (width == 0 || height == 0)
+            return;
+
+        m_width = width;
+        m_height = height;
+
+        bgfx::reset(m_width, m_height, BGFX_RESET_VSYNC);
+
+        bgfx::setViewRect(0, 0, 0, m_width, m_height);
+
+        m_camera.resize(
+            static_cast<float>(m_width),
+            static_cast<float>(m_height));
+    }
+
     void Renderer::beginFrame()
     {
         if (!m_initialized)

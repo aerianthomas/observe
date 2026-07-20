@@ -21,6 +21,10 @@ namespace observe
 
         bool pollEvents();
 
+        // Returns true (once) if the window's pixel size has changed since
+        // the last call, and writes the new size into outWidth/outHeight.
+        bool consumeResize(int &outWidth, int &outHeight) noexcept;
+
         void *nativeHandle() const;
         SDL_Window *handle() const noexcept;
 
@@ -32,6 +36,8 @@ namespace observe
 
         int m_width = 0;
         int m_height = 0;
+
+        bool m_sizeChanged = false;
     };
 
 }

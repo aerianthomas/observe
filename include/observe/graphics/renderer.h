@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include <observe/triangle.h>
-#include <observe/camera.h>
+#include <observe/graphics/triangle.h>
+#include <observe/graphics/camera.h>
 
 namespace observe
 {

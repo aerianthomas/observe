@@ -1,4 +1,4 @@
-#include <observe/camera.h>
+#include <observe/graphics/camera.h>
 
 #include <bgfx/bgfx.h>
 #include <bx/math.h>

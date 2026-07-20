@@ -1,5 +1,5 @@
-#include <observe/imgui_context.h>
-#include <observe/window.h>
+#include <observe/imgui/imgui_context.h>
+#include <observe/windowing/window.h>
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>

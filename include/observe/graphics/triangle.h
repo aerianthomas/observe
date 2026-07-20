@@ -1,8 +1,8 @@
 #pragma once
 
-#include <observe/mesh.h>
-#include <observe/shader.h>
-#include <observe/vertex_layout.h>
+#include <observe/graphics/mesh.h>
+#include <observe/graphics/shader.h>
+#include <observe/graphics/vertex_layout.h>
 #include <observe/math/transform.h>
 
 namespace observe

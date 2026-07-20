@@ -1,4 +1,4 @@
-#include <observe/shader_loader.h>
+#include <observe/graphics/shader_loader.h>
 
 #include <fstream>
 #include <vector>

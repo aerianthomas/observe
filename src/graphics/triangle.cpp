@@ -1,7 +1,7 @@
 // #include <iostream>
 #include <filesystem>
 
-#include <observe/triangle.h>
+#include <observe/graphics/triangle.h>
 
 namespace observe
 {

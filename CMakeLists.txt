@@ -122,7 +122,6 @@ add_subdirectory(external/bgfx.cmake)
 set(APP_SOURCES
     src/app/main.cpp
     src/app/application.cpp
-    src/imgui_context.cpp
 )
 
 set(WINDOWING_SOURCES
@@ -145,9 +144,8 @@ set(IMGUI_SOURCES
     external/imgui/imgui_draw.cpp
     external/imgui/imgui_tables.cpp
     external/imgui/imgui_widgets.cpp
-
     external/imgui/backends/imgui_impl_sdl3.cpp
-
+    src/imgui/imgui_context.cpp
     src/imgui/imgui_renderer.cpp
 )
 

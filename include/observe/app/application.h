@@ -1,10 +1,10 @@
 #pragma once
 
-#include <observe/window.h>
-#include <observe/renderer.h>
+#include <observe/windowing/window.h>
+#include <observe/graphics/renderer.h>
 
-#include <observe/imgui_context.h>
-#include <observe/imgui_renderer.h>
+#include <observe/imgui/imgui_context.h>
+#include <observe/imgui/imgui_renderer.h>
 
 namespace observe
 {

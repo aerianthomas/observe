@@ -1,5 +1,5 @@
-#include <observe/shader.h>
-#include <observe/shader_loader.h>
+#include <observe/graphics/shader.h>
+#include <observe/graphics/shader_loader.h>
 
 #include <bgfx/bgfx.h>
 

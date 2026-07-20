@@ -1,4 +1,4 @@
-#include <observe/mesh.h>
+#include <observe/graphics/mesh.h>
 
 namespace observe
 {

@@ -1,5 +1,5 @@
-#include <observe/renderer.h>
-#include <observe/window.h>
+#include <observe/graphics/renderer.h>
+#include <observe/windowing/window.h>
 
 #include <bgfx/bgfx.h>
 

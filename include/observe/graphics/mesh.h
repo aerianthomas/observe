@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <observe/vertex_layout.h>
+#include <observe/graphics/vertex_layout.h>
 
 namespace observe
 {

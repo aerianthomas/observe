@@ -4,7 +4,7 @@
 
 #include <bgfx/bgfx.h>
 
-#include <observe/shader.h>
+#include <observe/graphics/shader.h>
 
 namespace observe
 {

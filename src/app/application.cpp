@@ -1,5 +1,5 @@
-#include <observe/application.h>
-#include <observe/renderer.h>
+#include <observe/app/application.h>
+#include <observe/graphics/renderer.h>
 #include <imgui.h>
 
 // #include <iostream>

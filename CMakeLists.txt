@@ -4,116 +4,14 @@ project(observe)
 
 set(CMAKE_CXX_STANDARD 20)
 
-option(
-    OBSERVE_GUI_APPLICATION
-    "Build Windows GUI application (no console)"
-    ON
-)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-set(SDL_STATIC ON CACHE BOOL "" FORCE)
+include(ObserveWindows)
+include(ObserveCompiler)
+include(ObserveShaders)
+include(ObserveUtilities)
 
-set(BGFX_CONFIG_MULTITHREADED ON CACHE BOOL "" FORCE)
-set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BGFX_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
-set(BGFX_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-
-set(SHADERC
-    ${CMAKE_SOURCE_DIR}/tools/shaderc.exe)
-
-set(SHADER_SOURCE_DIR
-    ${CMAKE_SOURCE_DIR}/assets/shaders)
-
-set(SHADER_OUTPUT_DIR
-    ${CMAKE_BINARY_DIR}/shaders)
-
-file(MAKE_DIRECTORY ${SHADER_OUTPUT_DIR})
-
-set(SHADER_OUTPUTS)
-
-set(SHADER_PLATFORM windows)
-set(SHADER_PROFILE s_5_0)
-
-set(SHADER_VARYING_ARGS "")
-
-if(SHADER_VARYING)
-    list(APPEND SHADER_VARYING_ARGS
-        --varyingdef
-        ${SHADER_SOURCE_DIR}/${SHADER_VARYING}
-    )
-endif()
-
-function(observe_compile_shader)
-
-    cmake_parse_arguments(
-        SHADER
-        ""
-        "NAME;TYPE;VARYING"
-        ""
-        ${ARGN}
-    )
-
-    message(STATUS "Shader ${SHADER_NAME} varying = ${SHADER_VARYING}")
-
-    set(SHADER_VARYING_ARGS)
-
-    if(SHADER_VARYING)
-        list(APPEND SHADER_VARYING_ARGS
-            --varyingdef
-            ${SHADER_SOURCE_DIR}/${SHADER_VARYING}
-        )
-    endif()
-
-    message(STATUS "Shader ${SHADER_NAME} varying args = ${SHADER_VARYING_ARGS}")
-
-    add_custom_command(
-        OUTPUT
-            ${SHADER_OUTPUT_DIR}/${SHADER_NAME}.bin
-
-        COMMAND
-            ${SHADERC}
-            -f ${SHADER_SOURCE_DIR}/${SHADER_NAME}.sc
-            -o ${SHADER_OUTPUT_DIR}/${SHADER_NAME}.bin
-            --type ${SHADER_TYPE}
-            --platform ${SHADER_PLATFORM}
-            -p ${SHADER_PROFILE}
-            -i ${CMAKE_SOURCE_DIR}/external/bgfx.cmake/bgfx/src
-            ${SHADER_VARYING_ARGS}
-
-        DEPENDS
-            ${SHADER_SOURCE_DIR}/${SHADER_NAME}.sc
-
-        VERBATIM
-    )
-
-        set(
-        SHADER_OUTPUTS
-        ${SHADER_OUTPUTS}
-        ${SHADER_OUTPUT_DIR}/${SHADER_NAME}.bin
-        PARENT_SCOPE
-    )
-
-endfunction()
-
-function(observe_set_windows_subsystem TARGET GUI)
-
-    if(NOT WIN32)
-        return()
-    endif()
-
-    if(GUI)
-        set_target_properties(${TARGET}
-            PROPERTIES
-                WIN32_EXECUTABLE TRUE
-        )
-    else()
-        set_target_properties(${TARGET}
-            PROPERTIES
-                WIN32_EXECUTABLE FALSE
-        )
-    endif()
-
-endfunction()
+observe_configure_third_party_options()
 
 observe_compile_shader(
     NAME vs_triangle
@@ -143,16 +41,8 @@ add_custom_target(
 add_subdirectory(external/SDL3)
 #add_subdirectory(external/freetype)
 add_subdirectory(external/bgfx.cmake)
-#target_compile_definitions(bimg_decode PRIVATE BIMG_CONFIG_PARSE_EXR=0)
 
-set_source_files_properties(
-    #Exclude bimg's duplicate miniz.c (fixes LNK4006 conflicts with SDL3)
-    #Used only for (OpenEXR/HDR) texture loading via tinyexr.
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/bgfx.cmake/bimg/3rdparty/tinyexr/deps/miniz/miniz.c
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/bgfx.cmake/cmake/bimg
-    PROPERTIES HEADER_FILE_ONLY ON
-    #Optionally un-comment EXR=0 after add_subdirectory block to prevent harmless LNK4006.
-)
+observe_exclude_bimg_miniz()
 
 set(APP_SOURCES
     src/app/main.cpp
@@ -192,7 +82,7 @@ set(MATH_SOURCES
     src/math/vec4.cpp
 )
 
-add_executable(observe
+set(OBSERVE_SOURCES
     ${APP_SOURCES}
     ${WINDOWING_SOURCES}
     ${GRAPHICS_SOURCES}
@@ -200,33 +90,12 @@ add_executable(observe
     ${MATH_SOURCES}
 )
 
-observe_set_windows_subsystem(
-    observe
-    ${OBSERVE_GUI_APPLICATION}
-)
+# Built together, every time: observe (windowed) and observe-console
+# (stdout/stderr visible), from the same sources. See
+# cmake/ObserveWindows.cmake for how src/app/main.cpp supports both without
+# any preprocessor branching.
+add_executable(observe ${OBSERVE_SOURCES})
+observe_configure_executable(observe TRUE)
 
-add_dependencies(observe shaders)
-
-target_compile_options(observe PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus /Zc:preprocessor>
-)
-
-target_include_directories(observe
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/backends
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/SDL3/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/bgfx.cmake/bx/include
-)
-
-target_link_libraries(observe PRIVATE
-    SDL3::SDL3-static
-    #freetype
-    bgfx
-    bx
-)
+add_executable(observe-console ${OBSERVE_SOURCES})
+observe_configure_executable(observe-console FALSE)

@@ -4,6 +4,12 @@ project(observe)
 
 set(CMAKE_CXX_STANDARD 20)
 
+option(
+    OBSERVE_GUI_APPLICATION
+    "Build Windows GUI application (no console)"
+    ON
+)
+
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
 
@@ -86,6 +92,26 @@ function(observe_compile_shader)
         ${SHADER_OUTPUT_DIR}/${SHADER_NAME}.bin
         PARENT_SCOPE
     )
+
+endfunction()
+
+function(observe_set_windows_subsystem TARGET GUI)
+
+    if(NOT WIN32)
+        return()
+    endif()
+
+    if(GUI)
+        set_target_properties(${TARGET}
+            PROPERTIES
+                WIN32_EXECUTABLE TRUE
+        )
+    else()
+        set_target_properties(${TARGET}
+            PROPERTIES
+                WIN32_EXECUTABLE FALSE
+        )
+    endif()
 
 endfunction()
 
@@ -172,6 +198,11 @@ add_executable(observe
     ${GRAPHICS_SOURCES}
     ${IMGUI_SOURCES}
     ${MATH_SOURCES}
+)
+
+observe_set_windows_subsystem(
+    observe
+    ${OBSERVE_GUI_APPLICATION}
 )
 
 add_dependencies(observe shaders)

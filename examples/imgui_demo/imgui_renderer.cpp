@@ -1,4 +1,4 @@
-#include <observe/imgui/imgui_renderer.h>
+#include "imgui_renderer.h"
 
 #include <imgui.h>
 
@@ -7,7 +7,7 @@
 
 #include <cstring>
 
-namespace observe
+namespace imgui_demo
 {
 
     namespace

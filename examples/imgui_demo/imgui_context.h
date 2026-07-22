@@ -1,9 +1,9 @@
 #pragma once
 
-namespace observe
-{
+namespace observe { class Window; }
 
-    class Window;
+namespace imgui_demo
+{
 
     class ImGuiContext
     {
@@ -12,7 +12,7 @@ namespace observe
         ~ImGuiContext();
 
         bool initialize(
-            Window &window);
+            observe::Window &window);
 
         void shutdown();
 

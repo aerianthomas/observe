@@ -1,11 +1,14 @@
 #include <observe/app/application.h>
-#include <observe/graphics/renderer.h>
-#include <imgui.h>
 
 // #include <iostream>
 
 namespace observe
 {
+
+    void Application::addLayer(ApplicationLayer *layer)
+    {
+        m_layers.push_back(layer);
+    }
 
     bool Application::initialize()
     {
@@ -22,14 +25,12 @@ namespace observe
             return false;
         }
 
-        if (!m_imgui.initialize(m_window))
+        for (ApplicationLayer *layer : m_layers)
         {
-            return false;
-        }
-
-        if (!m_imguiRenderer.initialize())
-        {
-            return false;
+            if (!layer->initialize(m_window))
+            {
+                return false;
+            }
         }
 
         return true;
@@ -49,18 +50,19 @@ namespace observe
                     static_cast<uint32_t>(height));
             }
 
-            m_imgui.beginFrame();
-
-            ImGui::ShowDemoWindow(); // <- proves the pipeline works end-to-end
+            for (ApplicationLayer *layer : m_layers)
+                layer->update();
 
             m_renderer.beginFrame();
 
-            m_imgui.endFrame();
-
-            m_imguiRenderer.render();
+            for (ApplicationLayer *layer : m_layers)
+                layer->render();
 
             m_renderer.endFrame();
         }
+
+        for (ApplicationLayer *layer : m_layers)
+            layer->shutdown();
 
         // std::cout << "run loop exited\n";
     }

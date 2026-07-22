@@ -6,7 +6,7 @@
 
 #include <observe/graphics/shader.h>
 
-namespace observe
+namespace imgui_demo
 {
 
     class ImGuiRenderer
@@ -27,7 +27,7 @@ namespace observe
         bgfx::VertexLayout m_layout;
         bgfx::UniformHandle m_texUniform = BGFX_INVALID_HANDLE;
 
-        Shader m_shader;
+        observe::Shader m_shader;
     };
 
 }

@@ -1,10 +1,11 @@
-#include <observe/imgui/imgui_context.h>
+#include "imgui_context.h"
+
 #include <observe/windowing/window.h>
 
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 
-namespace observe
+namespace imgui_demo
 {
 
     ImGuiContext::~ImGuiContext()
@@ -13,7 +14,7 @@ namespace observe
     }
 
     bool ImGuiContext::initialize(
-        Window &window)
+        observe::Window &window)
     {
         IMGUI_CHECKVERSION();
 
@@ -26,6 +27,16 @@ namespace observe
         {
             return false;
         }
+
+        // Window has no idea ImGui exists - it just calls every
+        // registered listener for every SDL event it sees. This is what
+        // used to be a hardcoded ImGui_ImplSDL3_ProcessEvent() call
+        // inside Window::pollEvents() itself.
+        window.addEventListener(
+            [](const SDL_Event &event)
+            {
+                ImGui_ImplSDL3_ProcessEvent(&event);
+            });
 
         m_initialized = true;
 

@@ -21,6 +21,16 @@ observe_compile_shader(
     NAME fs_triangle
     TYPE fragment)
 
+observe_compile_shader(
+    NAME vs_ui
+    TYPE vertex
+    VARYING varying_ui.def.sc)
+
+observe_compile_shader(
+    NAME fs_ui
+    TYPE fragment
+    VARYING varying_ui.def.sc)
+
 add_custom_target(
     shaders ALL
 
@@ -45,7 +55,11 @@ set(OBSERVE_LIB_SOURCES
     src/graphics/vertex_layout.cpp
     src/graphics/mesh.cpp
     src/graphics/triangle.cpp
+    src/graphics/color.cpp
+    src/graphics/rect.cpp
     src/graphics/camera.cpp
+
+    src/ui/canvas.cpp
 
     src/math/mat4.cpp
     src/math/transform.cpp
@@ -72,3 +86,4 @@ add_executable(observe-console src/app/main.cpp)
 observe_configure_executable(observe-console FALSE)
 
 add_subdirectory(examples/imgui_demo)
+add_subdirectory(examples/canvas_demo)

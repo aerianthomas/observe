@@ -1,0 +1,23 @@
+if (MSVC)
+  set(OBSERVE_DEFINE_FLAG "/D")
+else()
+  set(OBSERVE_DEFINE_FLAG "-D")
+endif()
+
+if (EMSCRIPTEN)
+  add_compile_options(-DOBSERVE_EMSCRIPTEN=1)
+elseif (WIN32)
+  add_compile_options(${OBSERVE_DEFINE_FLAG}OBSERVE_WINDOWS=1)
+elseif (APPLE)
+  add_compile_options(-DOBSERVE_MAC=1)
+elseif (UNIX)
+  add_compile_options(-DOBSERVE_LINUX=1)
+endif()
+
+if (MSVC)
+  add_compile_options(/MP /wd4244 /wd4267 $<$<CONFIG:Debug>:/JMC>)
+else()
+  add_compile_options(-Wno-conversion -Wno-sign-conversion)
+endif()
+
+add_compile_definitions(OBSERVE_APPLICATION_NAME=\"${OBSERVE_APPLICATION_NAME}\")

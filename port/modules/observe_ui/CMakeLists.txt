@@ -1,0 +1,20 @@
+if (APPLE)
+  list(APPEND PLATFORM_FILES macos/menu_bar.mm)
+elseif (WIN32)
+  list(APPEND PLATFORM_FILES win32/menu_bar.cpp)
+endif ()
+
+file(GLOB HEADERS *.h)
+file(GLOB SOURCE_FILES *.cpp)
+if (OBSERVE_AMALGAMATED_BUILD)
+  amalgamate_sources(AMALGAMATED ${CMAKE_CURRENT_BINARY_DIR}/observe_ui_amalgamated "${SOURCE_FILES}")
+  list(APPEND SOURCE_FILES ${AMALGAMATED})
+endif ()
+
+amalgamate_headers(${OBSERVE_INCLUDE}/observe/ui.h "${HEADERS}")
+list(APPEND HEADERS ${OBSERVE_INCLUDE}/observe/ui.h)
+
+add_library(ObserveUi OBJECT ${SOURCE_FILES} ${HEADERS} ${PLATFORM_FILES})
+target_include_directories(ObserveUi PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${OBSERVE_INCLUDE_PATH})
+target_link_libraries(ObserveUi PRIVATE ObserveGraphicsEmbeds)
+set_target_properties(ObserveUi PROPERTIES FOLDER "observe")

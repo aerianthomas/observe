@@ -1,0 +1,185 @@
+#pragma once
+
+#include "modules/observe_utils/defines.h"
+#include "modules/observe_utils/events.h"
+#include "modules/observe_utils/space.h"
+
+#include <functional>
+#include <string>
+
+namespace observe
+{
+  class Frame;
+
+  class EventTimer
+  {
+  public:
+    EventTimer() = default;
+    virtual ~EventTimer();
+
+    auto &onTimerCallback() { return on_timer_callback_; }
+
+    void startTimer(int ms);
+    void stopTimer();
+    bool checkTimer(long long current_time);
+    virtual void timerCallback() {}
+
+    bool isRunning() const
+    {
+      OBSERVE_ASSERT(ms_ >= -1);
+      return ms_ > 0;
+    }
+
+  private:
+    void notifyTimerCallback() { on_timer_callback_.callback(); }
+
+    CallbackList<void()> on_timer_callback_{[this]() -> void
+                                            { timerCallback(); }};
+    int ms_ = 0;
+    long long last_run_time_ = 0;
+  };
+
+  class EventManager
+  {
+  public:
+    static EventManager &instance()
+    {
+      static EventManager instance;
+      return instance;
+    }
+
+    EventManager(const EventManager &) = delete;
+    EventManager &operator=(const EventManager &) = delete;
+
+    void addTimer(EventTimer *timer);
+    void removeTimer(const EventTimer *timer);
+    void addCallback(std::function<void()> callback);
+    void checkEventTimers();
+
+  private:
+    EventManager() = default;
+    ~EventManager() = default;
+
+    std::vector<EventTimer *> timers_{};
+    std::vector<std::function<void()>> callbacks_{};
+  };
+
+  static void runOnEventThread(std::function<void()> function)
+  {
+    EventManager::instance().addCallback(std::move(function));
+  }
+
+  struct MouseEvent
+  {
+    Point relativePosition() const { return relative_position; }
+    Point windowPosition() const { return window_position; }
+    bool isAltDown() const { return modifiers & kModifierAlt; }
+    bool isShiftDown() const { return modifiers & kModifierShift; }
+    bool isRegCtrlDown() const { return modifiers & kModifierRegCtrl; }
+    bool isMacCtrlDown() const { return modifiers & kModifierMacCtrl; }
+    bool isCtrlDown() const { return isRegCtrlDown() || isMacCtrlDown(); }
+    bool isCmdDown() const { return modifiers & kModifierCmd; }
+    bool isMetaDown() const { return modifiers & kModifierMeta; }
+    bool isOptionDown() const { return modifiers & kModifierAlt; }
+    bool isMainModifier() const { return isRegCtrlDown() || isCmdDown(); }
+
+    bool isDown() const { return is_down; }
+    bool isMouse() const { return !isTouch(); }
+    bool isTouch() const { return button_state & kMouseButtonTouch; }
+    bool hasWheelMomentum() const { return wheel_momentum; }
+    int repeatClickCount() const { return repeat_click_count; }
+
+    bool isLeftButtonCurrentlyDown() const { return button_state & kMouseButtonLeft; }
+    bool isMiddleButtonCurrentlyDown() const { return button_state & kMouseButtonMiddle; }
+    bool isRightButtonCurrentlyDown() const { return button_state & kMouseButtonRight; }
+
+    bool isLeftButton() const { return button_id == kMouseButtonLeft; }
+    bool isMiddleButton() const { return button_id == kMouseButtonMiddle; }
+    bool isRightButton() const { return button_id == kMouseButtonRight; }
+
+    MouseEvent relativeTo(const Frame *new_frame) const;
+
+    bool shouldTriggerPopup() const
+    {
+      return isRightButton() || (isLeftButton() && isMacCtrlDown());
+    }
+
+    const Frame *event_frame = nullptr;
+    Point position;
+    Point relative_position;
+    Point window_position;
+    MouseButton button_id = kMouseButtonNone;
+    int button_state = kMouseButtonNone;
+
+    int modifiers = 0;
+    bool is_down = false;
+    float wheel_delta_x = 0.0f;
+    float wheel_delta_y = 0.0f;
+    float precise_wheel_delta_x = 0.0f;
+    float precise_wheel_delta_y = 0.0f;
+    bool wheel_reversed = false;
+    bool wheel_momentum = false;
+    int repeat_click_count = 0;
+  };
+
+  class KeyEvent
+  {
+  public:
+    KeyEvent(KeyCode key, int mods, bool is_down, bool repeat = false) : key_code(key), modifiers(mods), key_down(is_down), is_repeat(repeat) {}
+
+    KeyCode keyCode() const { return key_code; }
+    bool isAltDown() const { return modifiers & kModifierAlt; }
+    bool isShiftDown() const { return modifiers & kModifierShift; }
+    bool isRegCtrlDown() const { return modifiers & kModifierRegCtrl; }
+    bool isMacCtrlDown() const { return modifiers & kModifierMacCtrl; }
+    bool isCtrlDown() const { return isRegCtrlDown() || isMacCtrlDown(); }
+    bool isCmdDown() const { return modifiers & kModifierCmd; }
+    bool isMetaDown() const { return modifiers & kModifierMeta; }
+    bool isOptionDown() const { return modifiers & kModifierAlt; }
+    int modifierMask() const { return modifiers; }
+    bool isMainModifier() const { return isRegCtrlDown() || isCmdDown(); }
+    bool isRepeat() const { return is_repeat; }
+
+    KeyEvent withMainModifier() const
+    {
+      KeyEvent copy = *this;
+      copy.modifiers = modifiers | kModifierRegCtrl;
+      return copy;
+    }
+
+    KeyEvent withMeta() const
+    {
+      KeyEvent copy = *this;
+      copy.modifiers = modifiers | kModifierMeta;
+      return copy;
+    }
+
+    KeyEvent withShift() const
+    {
+      KeyEvent copy = *this;
+      copy.modifiers = modifiers | kModifierShift;
+      return copy;
+    }
+
+    KeyEvent withAlt() const
+    {
+      KeyEvent copy = *this;
+      copy.modifiers = modifiers | kModifierAlt;
+      return copy;
+    }
+
+    KeyEvent withOption() const { return withAlt(); }
+
+    bool operator==(const KeyEvent &other) const
+    {
+      return key_code == other.key_code && key_down == other.key_down && modifiers == other.modifiers;
+    }
+
+    bool operator!=(const KeyEvent &other) const { return !(*this == other); }
+
+    KeyCode key_code = KeyCode::Unknown;
+    int modifiers = 0;
+    bool key_down = false;
+    bool is_repeat = false;
+  };
+}
